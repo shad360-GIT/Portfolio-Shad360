@@ -1,0 +1,27 @@
+OVERVIEW
+PE Solutions needed more than a refreshed UI kit. It needed a shared design language that product, UX, and engineering could all build on. I led the renovation of its fragmented design system into a scalable, reusable component library that raised consistency across the product suite and sped up the way designers work. Along the way I joined a global design team, set up new processes and tools, and laid the foundation for the system that followed.
+
+MY ROLE
+I owned the audit of the existing UI and the design of the component library: a set of reusable, customizable components that designers use to build interactions and interfaces. I partnered with engineers, senior interaction designers, and the visual design lead to take the system from concept to delivery.
+
+THE PROCESS
+I began with research: competitor analysis, target audiences, and industry trends. In parallel, I audited the existing interface to surface pain points and inconsistencies. This groundwork directly informed the early direction for PE Solutions' new brand and visual identity, a key input for a full rebrand and redesign of both product and platform.
+
+WHY A NEW DESIGN SYSTEM
+Before the update, PE Solutions had no single, unified design system. What existed was fragmented, inconsistent, and partly outdated, and its documentation left too much to interpretation. Product, UX, and engineering had no common foundation for process, design language, guidelines, or UI patterns.
+
+The new system set out to fix that: bring consistency to the product suite, refresh the color palette, typography, and iconography for web and mobile, and give the organization a way to scale design without losing quality. The result is a clearer path from design to delivery.
+
+HOW IT WORKS
+Every component goes through review. Once approved in Figma, it moves into the Atomic Components file, a shared library the whole team can pull from and drag into their designs. One source of truth, one place to look.
+
+OUTCOMES
+- Audited components across the product, then designed and built them into the library.
+- Delivered core product components to interaction designers as a ready-to-use library, improving designer productivity.
+- Improved the product's consistency and overall experience.
+- Ran training and testing sessions so designers could adopt the system with confidence.
+
+TAKEAWAYS
+- Designing and managing a system at scale
+- Balancing speed with craft
+- Gathering feedback and iterating on it

@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: 'Fraunces', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --color-navy: #003049;
+  --color-navy-dark: #002235;
+  --color-crimson: #D62828;
+  --color-crimson-hover: #b82222;
+  --color-orange: #F77F00;
+  --color-orange-hover: #db7000;
+  --color-yellow: #FCBF49;
+  --color-cream: #EAE2B7;
+  --color-cream-light: #FDFBF7;
+  --color-cream-card: #F8F4EA;
+  --color-cream-subtle: #F1ECE0;
+  --color-navy-muted: #244B63;
+  --color-body: #1F3646;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-sans);
+}
+
+body {
+  background-color: #FDFBF7;
+  color: #003049;
+}
+
+/* Accessible focus styling */
+:focus-visible {
+  outline: 2px solid #F77F00;
+  outline-offset: 2px;
+}
+
+/* Fraunces serif optical styling */
+.font-fraunces {
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+}
+
+.font-inter {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
