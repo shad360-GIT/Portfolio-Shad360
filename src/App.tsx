@@ -12,30 +12,37 @@ export default function App() {
   const [activeCaseStudyTab, setActiveCaseStudyTab] =
     useState<PortfolioCaseStudyTab>('pe-solutions');
 
-  // Sync hash routing if present
+  // Sync hash and pathname routing safely
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '');
-      if (hash === 'portfolio') {
+    const handleRouteChange = () => {
+      const hash = window.location.hash.replace(/^#\/?/, '').trim();
+      const pathname = window.location.pathname.replace(/^\//, '').replace(/\/$/, '').trim();
+      const target = hash || pathname;
+
+      if (target === 'portfolio') {
         setActiveTab('portfolio');
-      } else if (hash === 'portfolio-pe-solutions') {
+      } else if (target === 'portfolio-pe-solutions' || target === 'portfolio/pe-solutions') {
         setActiveTab('portfolio');
         setActiveCaseStudyTab('pe-solutions');
-      } else if (hash === 'portfolio-dell-services') {
+      } else if (target === 'portfolio-dell-services' || target === 'portfolio/dell-services') {
         setActiveTab('portfolio');
         setActiveCaseStudyTab('dell-services');
-      } else if (hash === 'about') {
+      } else if (target === 'about') {
         setActiveTab('about');
-      } else if (hash === 'contact') {
+      } else if (target === 'contact') {
         setActiveTab('contact');
-      } else if (hash === 'home' || !hash) {
+      } else {
         setActiveTab('home');
       }
     };
 
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    handleRouteChange();
+    window.addEventListener('hashchange', handleRouteChange);
+    window.addEventListener('popstate', handleRouteChange);
+    return () => {
+      window.removeEventListener('hashchange', handleRouteChange);
+      window.removeEventListener('popstate', handleRouteChange);
+    };
   }, []);
 
   const handleNavigate = (
