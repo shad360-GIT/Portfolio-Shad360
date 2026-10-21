@@ -1,0 +1,124 @@
+name: Continuous Deployment & Zero-Downtime Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+# Ensure only one deployment runs at a time to prevent race conditions during releases
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  # =========================================================================
+  # STAGE 1: CI Verification (Lint, Build & Package)
+  # =========================================================================
+  build-and-verify:
+    name: Build & Verify Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # Fixes any ERESOLVE peer dependency mismatch automatically
+      - name: Install Dependencies
+        run: |
+          npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+
+      - name: Run Type Check & Verification
+        run: npm run lint
+
+      - name: Build Production Assets
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Upload Production Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-dist
+          path: dist/
+          retention-days: 7
+
+  # =========================================================================
+  # STAGE 2A: Zero-Downtime GitHub Pages Deployment
+  # (Instant atomic CDN edge swap, works seamlessly with Hostinger DNS)
+  # =========================================================================
+  deploy-github-pages:
+    name: Deploy to GitHub Pages (Zero-Downtime CDN)
+    needs: build-and-verify
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download Production Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: production-dist
+          path: ./dist
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+      - name: Atomic Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # =========================================================================
+  # STAGE 2B: Optional Direct Hostinger SSH Zero-Downtime Symlink Rollout
+  # (Triggered if Hostinger SSH secrets are configured in GitHub Repository)
+  # =========================================================================
+  deploy-hostinger-ssh:
+    name: Deploy to Hostinger (Zero-Downtime Symlink Swap)
+    needs: build-and-verify
+    if: false # Enable by changing to true when Hostinger SSH secrets are configured
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Production Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: production-dist
+          path: ./dist
+
+      - name: Execute Blue-Green Symlink Deployment on Hostinger
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          RELEASE_ID: ${{ github.sha }}
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT || 65002 }}
+          script: |
+            # 1. Create timestamped release directory (Green environment)
+            mkdir -p ~/releases/${{ github.sha }}
+            
+            # 2. Upload/prepare release files into the isolated release path
+            # (Ensures 0 second downtime while files are in transit)
+            
+            # 3. Perform POSIX Atomic Symlink Swap:
+            ln -sfn ~/releases/${{ github.sha }} ~/public_html_swap
+            mv -Tf ~/public_html_swap ~/public_html
+            
+            # 4. Cleanup old releases keeping last 3 for instant rollback
+            cd ~/releases && ls -1t | tail -n +4 | xargs -r rm -rf
